@@ -1,5 +1,6 @@
 # :zap: lightning :zap:
-The simple and lightweight network simulator based on Docker containers
+Lightning 2.0 is a fork of the ptoribi/lightning repository, with the objective of 
+including more network appliances to the network emulator based on Docker containers
 
 ![Preview](https://raw.githubusercontent.com/ptoribi/lightning/master/screenshots/screenshot1.png)
 
