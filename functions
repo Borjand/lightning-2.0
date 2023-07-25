@@ -412,7 +412,7 @@ create_host() {
   docker exec --user=root $HOST_NAME useradd --uid $(id -u $USER_BEHIND_SUDO) --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $USER_BEHIND_SUDO
 
   # ptoribi: add the user to group "wireshark" so dumpcap could be executed by regular users
-  docker exec --user=root $HOST_NAME usermod -a -G wireshark $USER_BEHIND_SUDO
+  # docker exec --user=root $HOST_NAME usermod -a -G wireshark $USER_BEHIND_SUDO
   #docker cp $LIGHTNING_INSTALLATION_PATH/other/bash_persistent $HOST_NAME:/bin
   docker exec --user=root $HOST_NAME bash -c "echo \#Added by Lightning: >> /etc/hosts"
   docker exec --user=root $HOST_NAME bash -c "echo 127.0.1.1 $HOST_NAME_LONG >> /etc/hosts"
@@ -429,6 +429,7 @@ create_host() {
   # ptoribi: add created container to CONTAINERS_CREATED_FILE
   echo $HOST_NAME >> $CONTAINERS_CREATED_FILE
 
+  echo "[$(date +"%Y-%m-%d %T")] Container $HOST_NAME (PID=$CONTAINER_PID) successfully created" >> $LIGHTNING_GENERAL_LOG_FILE
   information_message "Container $HOST_NAME (PID=$CONTAINER_PID) successfully created"
 }
 
@@ -494,28 +495,11 @@ create_router() {
   ln -sf /proc/1/ns/net /var/run/netns/default
   ln -sf /proc/$CONTAINER_PID/ns/net /var/run/netns/$ROUTER_NAME
 
-  # ptoribi: copy quagga configuration files to the router container
-  if [ -d "$PATH_TO_CONTAINER_SPECIFIC_CONFIG_FILES/quagga" ]; then
-    # ptoribi: the common quagga configuration files will be copied to the router container and stored in /etc/quagga
-    docker cp $QUAGGA_CONFIG_FILES/quagga $ROUTER_NAME:/etc
-    # ptoribi: if directory for storing specific config files for this container "SCENARIO_NAME-config_files/quagga" exists, these files will be copied to /etc/quagga and will overwrite the common quagga configuration files
-    docker cp $PATH_TO_CONTAINER_SPECIFIC_CONFIG_FILES/quagga $ROUTER_NAME:/etc
-  else
-    # ptoribi: the common quagga configuration files will be copied to the router container and stored in /etc/quagga
-    docker cp $QUAGGA_CONFIG_FILES/quagga $ROUTER_NAME:/etc
-  fi
-
-  #docker cp $LIGHTNING_INSTALLATION_PATH/other/vtysh_persistent $ROUTER_NAME:/usr/bin
-  # ptoribi: all the config files must be owned by user and group "quagga" in order to work
-  docker exec --user=root $ROUTER_NAME bash -c "chown -R quagga:quagga /etc/quagga"
-  # ptoribi: the vtysh config file must be owned by user "quagga" and group "quaggavty" in order to work
-  docker exec --user=root $ROUTER_NAME bash -c "chown quagga:quaggavty /etc/quagga/vtysh.conf"
-  # ptoribi: the default hostname in the quagga configuration files will be replaced by the one specified for this router
-  docker exec --user=root $ROUTER_NAME bash -c "sed -i "s/DEFAULT_HOSTNAME/$ROUTER_NAME_LONG/g" /etc/quagga/*"
 
   # ptoribi: add created container to CONTAINERS_CREATED_FILE
   echo $ROUTER_NAME >> $CONTAINERS_CREATED_FILE
 
+  echo "[$(date +"%Y-%m-%d %T")] Container $ROUTER_NAME (PID=$CONTAINER_PID) successfully created" >> $LIGHTNING_GENERAL_LOG_FILE
   information_message "Container $ROUTER_NAME (PID=$CONTAINER_PID) successfully created"
 }
 
@@ -661,15 +645,11 @@ display_host() {
     local XTERM_WINDOW_TITLE=$1
   fi
 
-  # ptoribi: start ssh and telnet service in order to allow incoming connections
-  docker exec --user=root $HOST_NAME bash -c "/etc/init.d/ssh start" >> $LIGHTNING_GENERAL_LOG_FILE
-  docker exec --user=root $HOST_NAME bash -c "/etc/init.d/xinetd start" >> $LIGHTNING_GENERAL_LOG_FILE
 
-  #xterm -T "$XTERM_WINDOW_TITLE" -e "docker exec -i -t --user=$USER_BEHIND_SUDO $HOST_NAME bash_persistent $USER_BEHIND_SUDO" &
   # paaguti: if REMOTE=1, just print the Docker commands for an external program
   if [ $REMOTE -ne 1 ]
   then
-    mate-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" --command "docker exec -i -t --user=$USER_BEHIND_SUDO $HOST_NAME bash_persistent $USER_BEHIND_SUDO" &
+    gnome-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" -- docker exec -i -t --user=$USER_BEHIND_SUDO $HOST_NAME bash
   else
     echo "docker exec -i -t --user=$USER_BEHIND_SUDO $HOST_NAME bash_persistent $USER_BEHIND_SUDO" | tee -a $USER_BEHIND_SUDO_HOME_PATH/commands
   fi
@@ -690,17 +670,16 @@ display_router() {
     local XTERM_WINDOW_TITLE=$1
   fi
 
+  # bdorado: analyze this to check utility
   # ptoribi: start ssh and telnet service in order to allow incoming connections
-  docker exec --user=root $ROUTER_NAME bash -c "/etc/init.d/ssh start" >> $LIGHTNING_GENERAL_LOG_FILE
-  docker exec --user=root $ROUTER_NAME bash -c "/etc/init.d/xinetd start" >> $LIGHTNING_GENERAL_LOG_FILE
-  # ptoribi: the quagga daemon is started
-  docker exec --user=root $ROUTER_NAME bash -c "/etc/init.d/quagga start" >> $LIGHTNING_GENERAL_LOG_FILE
+  # docker exec --user=root $ROUTER_NAME bash -c "/etc/init.d/ssh start" >> $LIGHTNING_GENERAL_LOG_FILE
+  # docker exec --user=root $ROUTER_NAME bash -c "/etc/init.d/xinetd start" >> $LIGHTNING_GENERAL_LOG_FILE
 
   #xterm -T "$XTERM_WINDOW_TITLE" -e "docker exec -i -t $ROUTER_NAME vtysh_persistent" &
   # paaguti: if REMOTE=1, just print the Docker commands for an external program
   if [ $REMOTE -ne 1 ]
   then
-    mate-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" --command "docker exec -i -t $ROUTER_NAME vtysh_persistent" &
+    gnome-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" -- docker exec -i -t $ROUTER_NAME bash
   else
     echo "docker exec -i -t $ROUTER_NAME vtysh_persistent" | tee -a $USER_BEHIND_SUDO_HOME_PATH/commands
   fi
@@ -722,6 +701,8 @@ stop_containers() {
         rm $CONTAINERS_CREATED_FILE
         if [ $? == 0 ]
         then
+          echo "[$(date +"%Y-%m-%d %T")] Containers stopped!" >> $LIGHTNING_GENERAL_LOG_FILE
+          echo "" >> $LIGHTNING_GENERAL_LOG_FILE
           success_message "Containers stopped!"
         fi
         break
@@ -729,6 +710,7 @@ stop_containers() {
         docker stop $READEN_LINE >> $LIGHTNING_GENERAL_LOG_FILE
         if [ $? == 0 ]
         then
+          echo "[$(date +"%Y-%m-%d %T")] Container $READEN_LINE successfully stopped" >> $LIGHTNING_GENERAL_LOG_FILE
           information_message "Container $READEN_LINE successfully stopped"
         fi
         sed -i '1d' $CONTAINERS_CREATED_FILE
@@ -813,6 +795,7 @@ kill_evince() {
 # description: executes stop_containers and delete_networks and sfter that deletes both log files
 # example: lightning_stop
 lightning_stop() {
+  information_message "Deleting scenario ..."
   if [ -e $CONTAINERS_CREATED_FILE ] && [ -e $NETWORKS_CREATED_FILE ]
   then
     stop_containers
@@ -912,11 +895,13 @@ read_xml() {
   local CONTAINER_TYPE_ARRAY
   local CONTAINER_HOSTNAME_ARRAY
 
+  echo "[$(date +"%Y-%m-%d %T")] Validating XML scenario..." >> $LIGHTNING_GENERAL_LOG_FILE
   # ptoribi: first of all, validation. Lightning will not process XML files that do not comply with the Lightning XML Schema.
-  xmllint --schema $XSD_FILE $XML_FILE --noout >> $LIGHTNING_GENERAL_LOG_FILE
+  xmllint --schema $XSD_FILE $XML_FILE --noout >> $LIGHTNING_GENERAL_LOG_FILE 2>&1
   if [ $? == 0 ]
   then
     # XML OK
+    echo "[$(date +"%Y-%m-%d %T")] XML validated! Executing containers..." >> $LIGHTNING_GENERAL_LOG_FILE
     # paaguti: if local show the scenario if the PDF is available
     if [ $REMOTE -eq 0 ]; then
       [ -e $WALLPAPER ] && evince $WALLPAPER 2>/dev/null &

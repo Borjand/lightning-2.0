@@ -17,25 +17,17 @@
 ##                                                                                           ##
 ###############################################################################################
 
-#echo "lightning --> logname: $(logname)"
-#echo "lightning --> whoami:  $(whoami)"
-
 # ptoribi: "which" will find in the path the full location of the executable, "readlink -f" will resolve all possible symbolic links and "dirname" will remove the last component (file name).
 LIGHTNING_INSTALLATION_PATH=$(dirname $(readlink -f $(which lightning)))
 source $LIGHTNING_INSTALLATION_PATH/functions
-source $LIGHTNING_INSTALLATION_PATH/personalized_functions
-
-#echo $USER_BEHIND_SUDO:$GROUP_OF_USER_BEHIND_SUDO is executing Lightning, please enjoy!
 
 #paaguti: add a flag to enable/disable remote launching
 while getopts ":hR:" opt; do
     case $opt in
         h|\?)
-            help $
-            if [ "$opt" == "h"]; then
-                usage_message
-            fi
-            return 1
+            version_header
+            usage_message
+            exit 0
             ;;
         R)
             # Delete the old value for REMOTE if is exists
@@ -54,31 +46,27 @@ mkdir -p $LOGS_LOCATION
 
 if [ "$#" -eq 0 ]
 then
-  # Display header showing version number
   version_header
-  # Display usage message
   usage_message
 else
   # Stop
-  if [ "$#" -eq 1 ] && [ $1 == "stop" ]
-  then
+  if [ "$#" -eq 1 ] && [ $1 == "stop" ]; then
     lightning_stop
     # ptoribi: I remove the root from the list of local users allowed to make connections to the X server
     [ $REMOTE -eq 0 ] && xhost -SI:localuser:root >> /dev/null
+
   # Purge
-  elif [ "$#" -eq 1 ] && [ $1 == "purge" ]
-  then
+  elif [ "$#" -eq 1 ] && [ $1 == "purge" ]; then
     lightning_purge
+
   # Start
-  elif [ "$#" -eq 2 ] && [ $1 == "start" ]
-  then
+  elif [ "$#" -eq 2 ] && [ $1 == "start" ]; then
     if [[ -e $CONTAINERS_CREATED_FILE || -e $NETWORKS_CREATED_FILE ]] && [[ -e $SCENARIOS_PATH/$2 || -e $SCENARIOS_PATH/$2.xml || -e $SCENARIOS_PATH_LOCAL/$2 || -e $SCENARIOS_PATH_LOCAL/$2.xml ]]
     then
       error_message "Another user was running lightning or it wasn't properly closed the last time it was executed"
       information_message "Purging the system..."
       lightning_purge
-      if [ $? == 0 ]
-      then
+      if [ $? == 0 ]; then
           information_message "Launching selected scenario..."
       else
           error_message "Failed purging the system..."
@@ -95,18 +83,11 @@ else
       # ptoribi: I add the root to the list of local users allowed to make connections to the X server
       [ $REMOTE -ne 1 ] && xhost +SI:localuser:root >> /dev/null
 
-      # moved to read_xml
-      # if [ -e $SCENARIOS_PATH/$2.pdf ]
-      # then
-      #   evince $SCENARIOS_PATH/$2.pdf 2>/dev/null &
-      # fi
-
-      # if [ -e $SCENARIOS_PATH/$2.xml ]
-      # then
       # --- LAUNCHING SELECTED SCENARIO, XML PARSING ---
       # ptoribi: time will measure how much time takes the commmand to complete
       time read_xml $XML_FILE
       echo ""
+
     elif [ -n "$SCENARIO_FILE" ]; then
         if [ $REMOTE -eq 1 ]; then
             error_message "REMOTE scenarios not supported (yet) by Lightning (TODO)"
