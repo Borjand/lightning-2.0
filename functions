@@ -486,8 +486,8 @@ create_router() {
   # --sysctl net.ipv6.conf.all.disable_ipv6=0 enables IPv6
   # --sysctl net.ipv6.conf.all.forwarding=1 enables IPv6 forwarding
     # --sysctl net.ipv4.conf.all.rp_filter=0 disables reverse path filtering (and allows asymmetric routing)
-  docker run -t -d --rm --name=$ROUTER_NAME --hostname=$ROUTER_NAME_LONG --net=none $(get_sysctl router) \
-         --cap-drop=ALL $CAP_ADD_CHAIN_LIST $DOCKER_IMAGE_router >> $LIGHTNING_GENERAL_LOG_FILE
+  docker run --privileged -t -d --rm --name=$ROUTER_NAME --hostname=$ROUTER_NAME_LONG --net=none $(get_sysctl router) \
+         $DOCKER_IMAGE_router >> $LIGHTNING_GENERAL_LOG_FILE
 
   # ptoribi: create links for accessing the network namespace
   local CONTAINER_PID=`docker inspect -f '{{.State.Pid}}' $ROUTER_NAME`
@@ -495,6 +495,9 @@ create_router() {
   ln -sf /proc/1/ns/net /var/run/netns/default
   ln -sf /proc/$CONTAINER_PID/ns/net /var/run/netns/$ROUTER_NAME
 
+  # ptoribi: create user inside the container with same uid:gid as the one executing this program
+  docker exec --user=root $ROUTER_NAME groupadd --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $GROUP_OF_USER_BEHIND_SUDO
+  docker exec --user=root $ROUTER_NAME useradd --uid $(id -u $USER_BEHIND_SUDO) --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $USER_BEHIND_SUDO
 
   # ptoribi: add created container to CONTAINERS_CREATED_FILE
   echo $ROUTER_NAME >> $CONTAINERS_CREATED_FILE
