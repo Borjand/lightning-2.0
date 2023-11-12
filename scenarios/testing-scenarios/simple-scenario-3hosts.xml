@@ -68,6 +68,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
       <interface name="eth2"/>
     </container>
     
+  </network>  
   
   
 </scenario>
