@@ -404,7 +404,7 @@ create_host() {
   # --sysctl net.ipv6.conf.all.disable_ipv6=0 enables IPv6
   # --sysctl net.ipv4.conf.all.rp_filter=0 disables reverse path filtering (and allows asymmetric routing)
   docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none $(get_sysctl host) \
-         -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $SHARED_FOLDER:/home/$USER_BEHIND_SUDO \
+         --sysctl net.ipv4.ip_forward=0 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $SHARED_FOLDER:/home/$USER_BEHIND_SUDO \
          $DOCKER_IMAGE_host >> $LIGHTNING_GENERAL_LOG_FILE
 
   # ptoribi: create user inside the container with same uid:gid as the one executing this program
@@ -683,7 +683,7 @@ display_router() {
   # paaguti: if REMOTE=1, just print the Docker commands for an external program
   if [ $REMOTE -ne 1 ]
   then
-    gnome-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" -- docker exec -i -t $ROUTER_NAME bash
+    gnome-terminal --hide-menubar --title="$XTERM_WINDOW_TITLE" -- docker exec -i -t --user=$USER_BEHIND_SUDO $ROUTER_NAME bash
   else
     echo "docker exec -i -t $ROUTER_NAME vtysh_persistent" | tee -a $USER_BEHIND_SUDO_HOME_PATH/commands
   fi
