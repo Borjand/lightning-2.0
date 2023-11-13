@@ -496,9 +496,16 @@ create_router() {
   ln -sf /proc/1/ns/net /var/run/netns/default
   ln -sf /proc/$CONTAINER_PID/ns/net /var/run/netns/$ROUTER_NAME
 
+  # Adding user as a root
   # ptoribi: create user inside the container with same uid:gid as the one executing this program
   docker exec --user=root $ROUTER_NAME groupadd --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $GROUP_OF_USER_BEHIND_SUDO
   docker exec --user=root $ROUTER_NAME useradd --uid $(id -u $USER_BEHIND_SUDO) --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $USER_BEHIND_SUDO
+
+  docker exec --user=root $ROUTER_NAME bash -c "echo \#Added by Lightning: >> /etc/hosts"
+  docker exec --user=root $ROUTER_NAME bash -c "echo 127.0.1.1 $ROUTER_NAME_LONG >> /etc/hosts"
+  # ptoribi: allow that user to execute sudo without writting the password each time
+  docker exec --user=root $ROUTER_NAME bash -c "echo \#Added by Lightning: >> /etc/sudoers"
+  docker exec --user=root $ROUTER_NAME bash -c "echo $USER_BEHIND_SUDO ALL=\(ALL\) NOPASSWD: $SUDO_COMMANDS_CHAIN_LIST >> /etc/sudoers"
 
   # ptoribi: add created container to CONTAINERS_CREATED_FILE
   echo $ROUTER_NAME >> $CONTAINERS_CREATED_FILE
