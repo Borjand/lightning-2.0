@@ -505,7 +505,7 @@ create_router() {
   docker exec --user=root $ROUTER_NAME bash -c "echo 127.0.1.1 $ROUTER_NAME_LONG >> /etc/hosts"
   # ptoribi: allow that user to execute sudo without writting the password each time
   docker exec --user=root $ROUTER_NAME bash -c "echo \#Added by Lightning: >> /etc/sudoers"
-  docker exec --user=root $ROUTER_NAME bash -c "echo $USER_BEHIND_SUDO ALL=\(ALL\) NOPASSWD: $SUDO_COMMANDS_CHAIN_LIST >> /etc/sudoers"
+  docker exec --user=root $ROUTER_NAME bash -c "echo $USER_BEHIND_SUDO ALL=\(ALL\) NOPASSWD: ALL >> /etc/sudoers"
 
   # ptoribi: add created container to CONTAINERS_CREATED_FILE
   echo $ROUTER_NAME >> $CONTAINERS_CREATED_FILE
