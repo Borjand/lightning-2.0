@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<scenario description="SECCOMPS NETSYSTEMS: Topology scenario for first laboratory"
+<scenario description="Secure Computer Network Systems: Topology scenario for laboratory sessions"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
 
