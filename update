@@ -30,7 +30,7 @@ if [[ $(ls -l $LIGHTNING_INSTALLATION_PATH/scenarios-local | awk 'NR>1' | wc -l)
 fi
 
 # ptoribi: save the file personalized_functions
-cp $LIGHTNING_INSTALLATION_PATH/personalized_functions /tmp/personalized_functions-tmp
+# cp $LIGHTNING_INSTALLATION_PATH/personalized_functions /tmp/personalized_functions-tmp
 
 # ptoribi: save the security folder
 cp -r $LIGHTNING_INSTALLATION_PATH/security /tmp/security-tmp
@@ -79,7 +79,7 @@ then
   fi
 
   # ptoribi: restore personalized_functions
-  cp /tmp/personalized_functions-tmp $LIGHTNING_INSTALLATION_PATH/personalized_functions
+  # cp /tmp/personalized_functions-tmp $LIGHTNING_INSTALLATION_PATH/personalized_functions
 
   # ptoribi: restore security folder
   #cp -r /tmp/security-tmp/* $LIGHTNING_INSTALLATION_PATH/security
@@ -91,5 +91,4 @@ fi
 # ptoribi: remove temporal folders and files
 rm -rf /tmp/lightning-tmp
 rm -rf /tmp/scenarios-local-tmp
-rm -f /tmp/personalized_functions-tmp
 rm -rf /tmp/security-tmp
