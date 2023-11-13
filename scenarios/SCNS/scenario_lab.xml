@@ -5,21 +5,21 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
 
   <container name="PCA" type="host">
-    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="yes"/>
+    <interface name="eth1" enable_ipv6="no" link_local_ipv6="no"/>
   </container>
   
   <container name="PCB" type="host">
-    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="yes"/>
+    <interface name="eth1" enable_ipv6="no" link_local_ipv6="no"/>
   </container>
   
   <container name="RA" type="router">
-    <interface name="eth0.0" enable_ipv6="yes" link_local_ipv6="yes"/>
-    <interface name="eth0.1" enable_ipv6="yes" link_local_ipv6="yes"/>
+    <interface name="eth0.0" enable_ipv6="no" link_local_ipv6="no"/>
+    <interface name="eth0.1" enable_ipv6="no" link_local_ipv6="no"/>
   </container>
   
   <container name="RB" type="router">
-    <interface name="eth0.0" enable_ipv6="yes" link_local_ipv6="yes"/>
-    <interface name="eth0.1" enable_ipv6="yes" link_local_ipv6="yes"/>
+    <interface name="eth0.0" enable_ipv6="no" link_local_ipv6="no"/>
+    <interface name="eth0.1" enable_ipv6="no" link_local_ipv6="no"/>
   </container>
   
   
