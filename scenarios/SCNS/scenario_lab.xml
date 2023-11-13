@@ -23,7 +23,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
   </container>
   
   
-  <network name="RedA" type="switch">
+  <network name="NetA" type="switch">
     
     <container name="PCA">
       <interface name="eth1"/>
@@ -36,7 +36,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
   </network>
   
   
-  <network name="RedB" type="switch">
+  <network name="NetB" type="switch">
     
     <container name="PCB">
       <interface name="eth1"/>
@@ -49,7 +49,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
   </network>
   
   
-  <network name="RedR" type="switch">
+  <network name="NetR" type="switch">
     
     <container name="RA">
       <interface name="eth0.1"/>
