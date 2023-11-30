@@ -397,9 +397,9 @@ create_host() {
   # sudo -u $USER_BEHIND_SUDO mkdir -p $HOME/$SHARED_FOLDER
   #mkdir -p $SHARED_FOLDER
   #chown $USER_BEHIND_SUDO:$GROUP_OF_USER_BEHIND_SUDO $SHARED_FOLDER
-
-  HOST_SHARED_DIR=$SHARED_FOLDER/$XML_FILE_WITHOUT_EXTENSION/$HOST_NAME
-  mkdir -p $HOST_SHARED_DIR
+  SHARED_SCENARIO_NAME=$(basename "$XML_FILE_WITHOUT_EXTENSION")
+  HOST_SHARED_DIR=$SHARED_FOLDER/$SHARED_SCENARIO_NAME/$HOST_NAME
+  sudo -u $USER_BEHIND_SUDO mkdir -p $HOST_SHARED_DIR
   # ptoribi: run container with X-org forwarding support (I will try to make the same stuff but with wayland later) and $SHARED_FOLDER mounted as the home of the container
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $HOST_NAME" after stop
   # with "--cap-drop=ALL" I will drop all capabilities in order to have full control by adding one by one
@@ -482,9 +482,10 @@ create_router() {
   else
     error_message "$SECURITY_CAPABILITIES_FILE not found!"
   fi
-
-  ROUTER_SHARED_DIR=$SHARED_FOLDER/$XML_FILE_WITHOUT_EXTENSION/$ROUTER_NAME
-  mkdir -p $ROUTER_SHARED_DIR
+  
+  SHARED_SCENARIO_NAME=$(basename "$XML_FILE_WITHOUT_EXTENSION")
+  ROUTER_SHARED_DIR=$SHARED_FOLDER/$SHARED_SCENARIO_NAME/$ROUTER_NAME
+  sudo -u $USER_BEHIND_SUDO mkdir -p $ROUTER_SHARED_DIR
 
   # ptoribi: run container
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $ROUTER_NAME" after stop
