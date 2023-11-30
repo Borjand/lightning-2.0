@@ -313,6 +313,7 @@ create_host() {
 
   local HOST_NAME=$1
   local HOST_NAME_LONG=$2
+  local XML_FILE_WITHOUT_EXTENSION=$3
 
   local line_number
   local READEN_LINE
@@ -397,6 +398,8 @@ create_host() {
   #mkdir -p $SHARED_FOLDER
   #chown $USER_BEHIND_SUDO:$GROUP_OF_USER_BEHIND_SUDO $SHARED_FOLDER
 
+  HOST_SHARED_DIR=$SHARED_FOLDER/$XML_FILE_WITHOUT_EXTENSION/$HOST_NAME
+  mkdir -p $HOST_SHARED_DIR
   # ptoribi: run container with X-org forwarding support (I will try to make the same stuff but with wayland later) and $SHARED_FOLDER mounted as the home of the container
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $HOST_NAME" after stop
   # with "--cap-drop=ALL" I will drop all capabilities in order to have full control by adding one by one
@@ -405,7 +408,7 @@ create_host() {
   # --sysctl net.ipv4.conf.all.rp_filter=0 disables reverse path filtering (and allows asymmetric routing)
   # The -w option allows to open the bash session into the desired path
   docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none $(get_sysctl host) \
-         --sysctl net.ipv4.ip_forward=0 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $SHARED_FOLDER:/home/$USER_BEHIND_SUDO \
+         --sysctl net.ipv4.ip_forward=0 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOST_SHARED_DIR:/home/$USER_BEHIND_SUDO \
          -w /home/$USER_BEHIND_SUDO $DOCKER_IMAGE_host >> $LIGHTNING_GENERAL_LOG_FILE
 
   # ptoribi: create user inside the container with same uid:gid as the one executing this program
@@ -480,6 +483,9 @@ create_router() {
     error_message "$SECURITY_CAPABILITIES_FILE not found!"
   fi
 
+  ROUTER_SHARED_DIR=$SHARED_FOLDER/$XML_FILE_WITHOUT_EXTENSION/$ROUTER_NAME
+  mkdir -p $ROUTER_SHARED_DIR
+
   # ptoribi: run container
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $ROUTER_NAME" after stop
   # with "--cap-drop=ALL" I will drop all capabilities in order to have full control by adding one by one
@@ -488,7 +494,7 @@ create_router() {
   # --sysctl net.ipv6.conf.all.forwarding=1 enables IPv6 forwarding
   # --sysctl net.ipv4.conf.all.rp_filter=0 disables reverse path filtering (and allows asymmetric routing)
   docker run --privileged -t -d --rm --name=$ROUTER_NAME --hostname=$ROUTER_NAME_LONG --net=none $(get_sysctl router) \
-         --sysctl net.ipv4.ip_forward=1 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $SHARED_FOLDER:/home/$USER_BEHIND_SUDO \
+         --sysctl net.ipv4.ip_forward=1 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $ROUTER_SHARED_DIR:/home/$USER_BEHIND_SUDO \
          -w /home/$USER_BEHIND_SUDO $DOCKER_IMAGE_router >> $LIGHTNING_GENERAL_LOG_FILE
 
   # ptoribi: create links for accessing the network namespace
