@@ -74,8 +74,8 @@ then
   docker pull $DOCKER_IMAGE_host
   docker pull $DOCKER_IMAGE_router
   # bdorado: pull for all the images included in the variables.conf file
-  for image in "$DOCKER_IMAGE_TYPES[@]"; do
-    docker pull $image$DOCKER_IMAGE_VERSION
+  for image in "$DOCKER_IMAGE_TYPES"; do
+    docker pull $DOCKER_HUB_base/$image$DOCKER_IMAGE_VERSION
   done 
 
 else
