@@ -73,6 +73,10 @@ then
   # ptoribi: download & install / update the Docker images from DockerHub
   docker pull $DOCKER_IMAGE_host
   docker pull $DOCKER_IMAGE_router
+  # bdorado: pull for all the images included in the variables.conf file
+  for image in "$DOCKER_IMAGE_TYPES[@]"; do
+    docker pull $image$DOCKER_IMAGE_VERSION
+  done 
 
 else
   echo $(tput setaf 0)$(tput setab 1) "Lightning has to be installed as root or using "sudo"" $(tput sgr 0)
