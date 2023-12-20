@@ -327,9 +327,8 @@ create_docker_container() {
   # ptoribi: run container with X-org forwarding support (I will try to make the same stuff but with wayland later) and $SHARED_FOLDER mounted as the home of the container
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $HOST_NAME" after stop
   
-  docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none $(get_sysctl host) \
-         --sysctl net.ipv4.ip_forward=0 -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOST_SHARED_DIR:/home/$USER_BEHIND_SUDO \
-         -w /home/$USER_BEHIND_SUDO $IMAGE >> $LIGHTNING_GENERAL_LOG_FILE
+  docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none \
+         --sysctl net.ipv4.ip_forward=0 $IMAGE >> $LIGHTNING_GENERAL_LOG_FILE
 
   # Expect to have a user in every new device. Commenting the following commands
   # docker exec --user=root $HOST_NAME groupadd --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $GROUP_OF_USER_BEHIND_SUDO
