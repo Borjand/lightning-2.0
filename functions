@@ -328,6 +328,7 @@ create_docker_container() {
   # --rm means the container will be destroyed when stopped, no need to make "docker rm $HOST_NAME" after stop
   
   docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none \
+         -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOST_SHARED_DIR:/home/$USER_BEHIND_SUDO/shared-folder \
          --sysctl net.ipv4.ip_forward=0 $IMAGE >> $LIGHTNING_GENERAL_LOG_FILE
 
   # Added: 
