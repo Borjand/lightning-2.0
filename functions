@@ -330,6 +330,10 @@ create_docker_container() {
   docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none \
          --sysctl net.ipv4.ip_forward=0 $IMAGE >> $LIGHTNING_GENERAL_LOG_FILE
 
+  # Added: 
+  docker exec --user=root $HOST_NAME bash -c "echo \#Added by Lightning: >> /etc/hosts"
+  docker exec --user=root $HOST_NAME bash -c "echo 127.0.1.1 $HOST_NAME_LONG >> /etc/hosts"
+
   # Expect to have a user in every new device. Commenting the following commands
   # docker exec --user=root $HOST_NAME groupadd --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $GROUP_OF_USER_BEHIND_SUDO
   # docker exec --user=root $HOST_NAME useradd --uid $(id -u $USER_BEHIND_SUDO) --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $USER_BEHIND_SUDO
@@ -1118,6 +1122,15 @@ read_xml() {
       then
         display_router ${CONTAINER_NAME_ARRAY[index]} ${CONTAINER_HOSTNAME_ARRAY[index]}
       fi
+    
+      # Added to display the other types of containers:
+      for image in ${DOCKER_IMAGE_TYPES[@]}; do
+        if [ ${CONTAINER_TYPE_ARRAY[index]} == $image ]
+        then
+          display_host ${CONTAINER_NAME_ARRAY[index]} ${CONTAINER_HOSTNAME_ARRAY[index]}
+        fi
+      done 
+
     done
     #
     # paaguti: create the description and make files accessible to user
