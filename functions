@@ -300,6 +300,9 @@ create_container() {
   elif [ $TYPE == "router" ]; then
     create_router $CONTAINER_NAME $CONTAINER_NAME_LONG $XML_FILE_WITHOUT_EXTENSION
   
+  elif [ $TYPE == "switch_q "]; then
+    create_switch_q $CONTAINER_NAME $CONTAINER_NAME_LONG $XML_FILE_WITHOUT_EXTENSION 
+  
   # Added to support the execution of additional containers
   # Requirement: having an image with the same name as the type (e.g., qkd_node)
   else 
@@ -362,7 +365,53 @@ create_docker_container() {
 }
 
 
+create_switch_q() {
 
+  local HOST_NAME=$1
+  local HOST_NAME_LONG=$2
+  local XML_FILE_WITHOUT_EXTENSION=$3
+  
+  # Create a shared folder for the device
+  SHARED_SCENARIO_NAME=$(basename "$XML_FILE_WITHOUT_EXTENSION")
+  HOST_SHARED_DIR=$SHARED_FOLDER/$SHARED_SCENARIO_NAME/$HOST_NAME
+  sudo -u $USER_BEHIND_SUDO mkdir -p $HOST_SHARED_DIR
+  
+  # ptoribi: run container with X-org forwarding support (I will try to make the same stuff but with wayland later) and $SHARED_FOLDER mounted as the home of the container
+  # --rm means the container will be destroyed when stopped, no need to make "docker rm $HOST_NAME" after stop
+  
+  docker run --privileged -t -d --rm --name=$HOST_NAME --hostname=$HOST_NAME_LONG --net=none \
+         -e DISPLAY=unix$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOST_SHARED_DIR:/home/$USER_BEHIND_SUDO/shared-folder \
+         --sysctl net.ipv4.ip_forward=0 $DOCKER_IMAGE_switch_q >> $LIGHTNING_GENERAL_LOG_FILE
+
+  # Added: 
+  docker exec --user=root $HOST_NAME bash -c "echo \#Added by Lightning: >> /etc/hosts"
+  docker exec --user=root $HOST_NAME bash -c "echo 127.0.1.1 $HOST_NAME_LONG >> /etc/hosts"
+
+  # Expect to have a user in every new device. Commenting the following commands
+  # docker exec --user=root $HOST_NAME groupadd --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $GROUP_OF_USER_BEHIND_SUDO
+  # docker exec --user=root $HOST_NAME useradd --uid $(id -u $USER_BEHIND_SUDO) --gid $(id -g $GROUP_OF_USER_BEHIND_SUDO) $USER_BEHIND_SUDO
+
+  # ptoribi: add the user to group "wireshark" so dumpcap could be executed by regular users
+  # docker exec --user=root $HOST_NAME usermod -a -G wireshark $USER_BEHIND_SUDO
+  #docker cp $LIGHTNING_INSTALLATION_PATH/other/bash_persistent $HOST_NAME:/bin
+  #docker exec --user=root $HOST_NAME bash -c "echo \#Added by Lightning: >> /etc/hosts"
+  #docker exec --user=root $HOST_NAME bash -c "echo 127.0.1.1 $HOST_NAME_LONG >> /etc/hosts"
+  # ptoribi: allow that user to execute sudo without writting the password each time
+  #docker exec --user=root $HOST_NAME bash -c "echo \#Added by Lightning: >> /etc/sudoers"
+  #docker exec --user=root $HOST_NAME bash -c "echo $USER_BEHIND_SUDO ALL=\(ALL\) NOPASSWD: $SUDO_COMMANDS_CHAIN_LIST >> /etc/sudoers"
+
+  # ptoribi: create links for accessing the network namespace
+  local CONTAINER_PID=`docker inspect -f '{{.State.Pid}}' $HOST_NAME`
+  mkdir -p /var/run/netns
+  ln -sf /proc/1/ns/net /var/run/netns/default
+  ln -sf /proc/$CONTAINER_PID/ns/net /var/run/netns/$HOST_NAME
+
+  # ptoribi: add created container to CONTAINERS_CREATED_FILE
+  echo $HOST_NAME >> $CONTAINERS_CREATED_FILE
+
+  echo "[$(date +"%Y-%m-%d %T")] Container $HOST_NAME (PID=$CONTAINER_PID) successfully created" >> $LIGHTNING_GENERAL_LOG_FILE
+  information_message "Container $HOST_NAME (PID=$CONTAINER_PID) successfully created"
+}
 
 # usage: create_host HOST_NAME HOST_NAME_LONG XML_FILE_WITHOUT_EXTENSION
 # description: creates a host with no network interfaces
