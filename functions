@@ -1167,6 +1167,11 @@ read_xml() {
       then
         display_host ${CONTAINER_NAME_ARRAY[index]} ${CONTAINER_HOSTNAME_ARRAY[index]}
       fi
+      
+      if [ ${CONTAINER_TYPE_ARRAY[index]} == "switch_q" ]
+      then
+        display_host ${CONTAINER_NAME_ARRAY[index]} ${CONTAINER_HOSTNAME_ARRAY[index]}
+      fi
 
       if [ ${CONTAINER_TYPE_ARRAY[index]} == "router" ]
       then
