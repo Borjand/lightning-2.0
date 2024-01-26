@@ -300,7 +300,7 @@ create_container() {
   elif [ $TYPE == "router" ]; then
     create_router $CONTAINER_NAME $CONTAINER_NAME_LONG $XML_FILE_WITHOUT_EXTENSION
   
-  elif [ $TYPE == "switch_q "]; then
+  elif [ $TYPE == "switch_q" ]; then
     create_switch_q $CONTAINER_NAME $CONTAINER_NAME_LONG $XML_FILE_WITHOUT_EXTENSION 
   
   # Added to support the execution of additional containers
