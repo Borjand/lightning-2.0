@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<scenario description="Escenario de prueba simple con 2 PCs y un router"
+<scenario description="Escenario de prueba simple con 3 PCs y un router"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
 
