@@ -12,7 +12,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
   
   <container name="hostY" hostname="hostY" type="host">
     <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.1.10/24</default_ip>
+      <default_ip>192.168.2.10/24</default_ip>
     </interface>
   </container>
   
@@ -21,58 +21,58 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
       <default_ip>192.168.0.1/24</default_ip>
     </interface>
     <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.7.1/24</default_ip>
+      <default_ip>192.168.1.1/30</default_ip>
     </interface>
     <interface name="eth2" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.2.1/24</default_ip>
+      <default_ip>192.168.3.1/24</default_ip>
     </interface>
   </container>
   
   <container name="R2" hostname="R2" type="router">
     <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.0.2/24</default_ip>
+      <default_ip>192.168.2.2/24</default_ip>
     </interface>
     <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.7.2/24</default_ip>
+      <default_ip>192.168.1.2/30</default_ip>
     </interface>
     <interface name="eth2" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.3.2/24</default_ip>
+      <default_ip>192.168.4.2/24</default_ip>
     </interface>
   </container>
 
   <container name="qnode1" hostname="qnode1" type="qnode">
     <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.2.10/24</default_ip>
+      <default_ip>192.168.5.10/24</default_ip>
+    </interface>
+    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
+      <default_ip>192.168.3.10/24</default_ip>
+    </interface>
+  </container>
+
+  <container name="qnode2" hostname="qnode2" type="qnode">
+    <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
+      <default_ip>192.168.6.10/24</default_ip>
     </interface>
     <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
       <default_ip>192.168.4.10/24</default_ip>
     </interface>
   </container>
 
-  <container name="qnode2" hostname="qnode2" type="qnode">
-    <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.3.10/24</default_ip>
-    </interface>
-    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.5.10/24</default_ip>
-    </interface>
-  </container>
-
   <container name="sdn_node" hostname="sdn_node" type="sdn_node">
     <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.6.10/24</default_ip>
+      <default_ip>192.168.7.10/24</default_ip>
     </interface>
   </container>
   
   <container name="switch_q1" hostname="switch_q1" type="switch_q">
     <interface name="eth0" enable_ipv6="yes" link_local_ipv6="no">
-      <default_ip>192.168.4.1/24</default_ip>
-    </interface>
-    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
       <default_ip>192.168.5.1/24</default_ip>
     </interface>
-    <interface name="eth2" enable_ipv6="yes" link_local_ipv6="no">
+    <interface name="eth1" enable_ipv6="yes" link_local_ipv6="no">
       <default_ip>192.168.6.1/24</default_ip>
+    </interface>
+    <interface name="eth2" enable_ipv6="yes" link_local_ipv6="no">
+      <default_ip>192.168.7.1/24</default_ip>
     </interface>
   </container>
 
