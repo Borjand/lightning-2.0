@@ -119,7 +119,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
     </container>
     
     <container name="qnode1">
-      <interface name="eth0"/>
+      <interface name="eth1"/>
     </container>
 
   </network>
@@ -131,7 +131,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
     </container>
     
     <container name="qnode2">
-      <interface name="eth0"/>
+      <interface name="eth1"/>
     </container>
 
   </network>
@@ -143,7 +143,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
     </container>
     
     <container name="qnode1">
-      <interface name="eth1"/>
+      <interface name="eth0"/>
     </container>
 
   </network>
@@ -155,7 +155,7 @@ xsi:noNamespaceSchemaLocation="lightning-xml-schema.xsd">
     </container>
     
     <container name="qnode2">
-      <interface name="eth1"/>
+      <interface name="eth0"/>
     </container>
 
   </network>
